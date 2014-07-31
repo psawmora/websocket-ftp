@@ -1,0 +1,4 @@
+SCTP Communication Level quality requirements.
+----------------------------------------------
+1. Send/Receive data encoders and decoders should be de-coupled from data senders.
+2. Between layers, there should me minimal thread overhead.

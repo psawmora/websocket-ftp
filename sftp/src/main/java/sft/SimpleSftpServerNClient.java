@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
 
 /**
  * @author: prabath
@@ -19,6 +17,8 @@ public class SimpleSftpServerNClient {
     public static final int STREAM_ONE = 1;
 
     public static final int STREAM_TWO = 2;
+
+    public static final int MAX_SEND_SIZE = 102400; // 10kb
 
     public void initSctpServer() throws IOException {
         SctpServerChannel sctpServerChannel = SctpServerChannel.open();
@@ -67,7 +67,7 @@ public class SimpleSftpServerNClient {
                         System.out.println("SCTP Message : " + new String(receiveBuff.array()) + " Stream Number  : " +
                                 msgInfo.streamNumber());
                     }
-                    Thread.sleep(10);
+                    receiveBuff.clear();
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
@@ -90,53 +90,14 @@ public class SimpleSftpServerNClient {
 
         ByteBuffer writeBuff = ByteBuffer.wrap(new String("Test1Test1").getBytes());
         channel.send(writeBuff, MessageInfo.createOutgoing(null, STREAM_ONE));
-
-    }
-
-    public void initNormalServer() throws IOException {
-        ServerSocketChannel serverChannel = ServerSocketChannel.open();
-        serverChannel.configureBlocking(false);
-        serverChannel.bind(new InetSocketAddress(SERVER_PORT));
-        ByteBuffer receiveBuffer = ByteBuffer.allocate(10);
-
-        while (true) {
-            SocketChannel channel = serverChannel.accept();
-            if (channel != null) {
-                System.out.println("Got a connection");
-                int readLength = 0;
-                while (true) {
-                    readLength = channel.read(receiveBuffer);
-                    if (readLength > 0) {
-                        receiveBuffer.flip();
-                        System.out.println("Received Msg : " + new String(receiveBuffer.array()));
-                    }
-                }
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-
-            }
-
+        channel.send((ByteBuffer) writeBuff.flip(), MessageInfo.createOutgoing(null, STREAM_TWO));
+        channel.send((ByteBuffer) writeBuff.flip(), MessageInfo.createOutgoing(null, STREAM_ONE));
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-    }
-
-    public void startNormalClient() throws IOException {
-        SocketChannel socketChannel = SocketChannel.open();
-        socketChannel.configureBlocking(false);
-        socketChannel.connect(new InetSocketAddress(SERVER_PORT));
-        while (!socketChannel.finishConnect()) {
-            try {
-                System.out.println("Trying to connect");
-            } catch (Throwable th) {
-                th.printStackTrace();
-            }
-        }
-        ByteBuffer writeBuff = ByteBuffer.wrap(new String("Test1Test1").getBytes());
-        socketChannel.write(writeBuff);
-        socketChannel.write((ByteBuffer) writeBuff.flip());
-        socketChannel.write((ByteBuffer) writeBuff.flip());
+        channel.close();
     }
 
     public static void main(String[] args) {
@@ -147,7 +108,6 @@ public class SimpleSftpServerNClient {
                 public void run() {
                     try {
                         serverNClient.initSctpServer();
-                        //                        serverNClient.initNormalServer();
                     } catch (Throwable e) {
                         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                     }
@@ -159,7 +119,6 @@ public class SimpleSftpServerNClient {
                 public void run() {
                     try {
                         serverNClient.startSctpClient();
-                        //serverNClient.startNormalClient();
                     } catch (Throwable e) {
                         e.printStackTrace();
                     }
