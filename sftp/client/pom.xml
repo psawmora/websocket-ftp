@@ -9,11 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>sftp</artifactId>
-
-    <modules>
-        <module>client</module>
-    </modules>
+    <artifactId>client</artifactId>
 
 
 </project>

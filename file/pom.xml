@@ -9,11 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>sftp</artifactId>
+    <artifactId>file</artifactId>
+    <dependencies>
+        <dependency>
+        	<groupId>io.netty</groupId>
+        	<artifactId>netty</artifactId>
+        	<version>3.6.2.Final</version>
+        </dependency>
 
-    <modules>
-        <module>client</module>
-    </modules>
-
+    </dependencies>
 
 </project>
