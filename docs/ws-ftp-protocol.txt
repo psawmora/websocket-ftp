@@ -1,0 +1,3 @@
+1. Request and Response based client-server protocol.
+   - Send file relative URL
+2. Request PDUs.
