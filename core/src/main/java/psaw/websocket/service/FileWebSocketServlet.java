@@ -58,7 +58,7 @@ public class FileWebSocketServlet extends WebSocketServlet {
         webSocketServletFactory.setCreator(
                 (servletUpgradeRequest, servletUpgradeResponse) -> {
                     logger.debug("New WebSocket Upgrade Request Received. [{}]", servletUpgradeRequest);
-                    return new ChargingRequestSocketEndPoint(senderService);
+                    return new FileTransferSocketEndPoint(senderService);
                 });
     }
 }

@@ -16,16 +16,16 @@ import java.util.concurrent.ExecutorService;
 
 /**
  * <p>
- * <code>ChargingRequestSocketEndPoint</code> -
+ * <code>FileTransferSocketEndPoint</code> -
  * WebSocket endpoint for the charging requests. Used the native WS implementation.
  * </p>
  *
  * @author: prabath
  */
 
-public class ChargingRequestSocketEndPoint extends WebSocketAdapter {
+public class FileTransferSocketEndPoint extends WebSocketAdapter {
 
-    private static final Logger logger = LogManager.getLogger(ChargingRequestSocketEndPoint.class);
+    private static final Logger logger = LogManager.getLogger(FileTransferSocketEndPoint.class);
 
     private int maxFilePartSize = 2 * 1024 * 1024;
 
@@ -38,7 +38,7 @@ public class ChargingRequestSocketEndPoint extends WebSocketAdapter {
     //    private String defaultFilePath = "/home/prabath/Projects/websocket-ftp/core/src/main/resources/test-text.txt";
 
 
-    public ChargingRequestSocketEndPoint(ExecutorService senderService) {
+    public FileTransferSocketEndPoint(ExecutorService senderService) {
 
     }
 
