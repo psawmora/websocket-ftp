@@ -66,7 +66,13 @@
             console.log("File Part Length : " + fileDataLength + " | Index : " + filePartIndex);
             var content = new Uint8Array(pduBuffer);
             dataParts.push(content.subarray(8, 8 + fileDataLength));
+            sendAck(pduBuffer);
         }
+
+        function sendAck(pduBuffer) {
+
+        }
+
     }
 
 })(jQuery);

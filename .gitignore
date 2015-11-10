@@ -1,0 +1,29 @@
+# Compiled source #
+###################
+*.class
+*.exe
+*.so
+
+# Idea Project Files #
+######################
+*.iml
+*.iws
+.idea
+*.ipr
+
+# Eclipse Project Files #
+#########################
+.classpath
+.project
+.settings/**/*
+.metadata/**/*
+
+# Maven Target folder #
+#################
+target
+
+
+# SBT Internals #
+#################
+lib_managed
+**/project/boot

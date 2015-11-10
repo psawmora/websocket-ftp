@@ -1,0 +1,4 @@
+1. Annotation based codec.
+2. Error handling and recovery.
+3. Security(TLS).
+4. Better file reader.
