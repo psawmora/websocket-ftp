@@ -51,5 +51,10 @@
             <artifactId>jetty-annotations</artifactId>
             <version>${jetty-version}</version>
         </dependency>
+        <dependency>
+            <groupId>psaw.java</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

@@ -4,14 +4,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import psaw.websocket.domain.BasePdu;
+import psaw.websocket.service.adapter.RequestAdapter;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -23,62 +21,39 @@ import java.util.concurrent.ExecutorService;
  * @author: prabath
  */
 
-public class FileTransferSocketEndPoint extends WebSocketAdapter {
+public class FileTransferSocketEndPoint extends WebSocketAdapter implements ResponseSender {
 
     private static final Logger logger = LogManager.getLogger(FileTransferSocketEndPoint.class);
+
+    private final String id;
 
     private int maxFilePartSize = 2 * 1024 * 1024;
 
     private Session session;
 
-    private String defaultFilePath = "/home/prabath/Projects/websocket-ftp/core/src/main/resources/";
+    private RequestAdapter<BasePdu> requestAdapter;
 
-    //    private String defaultFilePath = "/software/The Maze Runner (2014)/The.Maze.Runner.2014.720p.BluRay.x264.YIFY.mp4";
-    //    private String defaultFilePath = "/home/prabath/Projects/websocket-ftp/core/src/main/resources/call_busy.mp3";
-    //    private String defaultFilePath = "/home/prabath/Projects/websocket-ftp/core/src/main/resources/test-text.txt";
-
-
-    public FileTransferSocketEndPoint(ExecutorService senderService) {
-
+    public FileTransferSocketEndPoint(ExecutorService senderService, RequestAdapter requestAdapter) {
+        this.requestAdapter = requestAdapter;
+        this.id = String.valueOf(System.currentTimeMillis());
     }
 
     @Override
     public void onWebSocketBinary(byte[] payload, int offset, int len) {
         ByteBuffer requestBuffer = ByteBuffer.wrap(payload);
-        byte[] nameLengthArray = new byte[4];
-        requestBuffer = requestBuffer.get(nameLengthArray, 0, 4).slice();
-        int nameLength = ByteBuffer.wrap(nameLengthArray).order(ByteOrder.LITTLE_ENDIAN).getInt();
-        byte[] fileNameBytes = new byte[nameLength];
-        requestBuffer.get(fileNameBytes, 0, nameLength);
-        String fileName = new String(fileNameBytes, Charset.defaultCharset());
-        System.out.println("File Name : " + fileName);
-        String filePath = defaultFilePath.concat(fileName);
-        readFile(filePath);
+        try {
+            requestAdapter.processRequest(requestBuffer, id);
+        } catch (Exception e) {
+            logger.error("Error occurred while processing the request", e);
+        }
     }
 
     @Override
-    public void onWebSocketText(String message) {
-        System.out.println("Got Message : " + message);
-    }
-
-    private void readFile(String filePath) {
-        try (RandomAccessFile fileStream = new RandomAccessFile(new File(filePath), "r");
-             FileChannel channel = fileStream.getChannel()) {
-            ByteBuffer fileBuffer = ByteBuffer.allocate(maxFilePartSize);
-            int length;
-            int totalSize = 0;
-            int index = 1;
-            while ((length = channel.read(fileBuffer)) > 0) {
-                sendFilePart(fileBuffer, length, index);
-                fileBuffer.limit(maxFilePartSize).position(0);
-                totalSize += length;
-                index++;
-                System.out.println("Total Size : " + totalSize);
-            }
-            session.getRemote().sendBytes(ByteBuffer.allocate(0));
-            System.out.println("Done");
+    public void sendResponseBack(ByteBuffer buffer) throws WSFtpException {
+        try {
+            session.getRemote().sendBytesByFuture(buffer);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new WSFtpException(Status.RESPONSE_SEND_FAILED, "Response sending failed", e);
         }
     }
 
@@ -105,16 +80,23 @@ public class FileTransferSocketEndPoint extends WebSocketAdapter {
 
     @Override
     public void onWebSocketConnect(Session session) {
-        System.out.println("WebSocket Connection established");
         logger.info("WebSocket connection established [{}]", session);
         this.session = session;
+        requestAdapter.register(id, this);
     }
 
     @Override
     public void onWebSocketError(Throwable th) {
+        requestAdapter.unRegister(id);
     }
 
     @Override
     public void onWebSocketClose(int statusCode, String reason) {
+        requestAdapter.unRegister(id);
+    }
+
+    @Override
+    public void onWebSocketText(String message) {
+        logger.debug("Got Text Message : [{}]", message);
     }
 }

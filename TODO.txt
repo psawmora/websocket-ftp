@@ -2,3 +2,4 @@
 2. Error handling and recovery.
 3. Security(TLS).
 4. Better file reader.
+5. Codecs based on the PDU type.

@@ -4,6 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
+import psaw.websocket.domain.BasePdu;
+import psaw.websocket.service.adapter.RequestAdapter;
 
 import javax.servlet.ServletException;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +26,8 @@ public class FileWebSocketServlet extends WebSocketServlet {
     private ExecutorService senderService;
 
     private int wsEndPointSenderThreadCount = 10;
+
+    private RequestAdapter<BasePdu> requestAdapter;
 
     @Override
     public void log(String msg) {
@@ -58,7 +62,11 @@ public class FileWebSocketServlet extends WebSocketServlet {
         webSocketServletFactory.setCreator(
                 (servletUpgradeRequest, servletUpgradeResponse) -> {
                     logger.debug("New WebSocket Upgrade Request Received. [{}]", servletUpgradeRequest);
-                    return new FileTransferSocketEndPoint(senderService);
+                    return new FileTransferSocketEndPoint(senderService, requestAdapter);
                 });
+    }
+
+    public void setRequestAdapter(RequestAdapter<BasePdu> requestAdapter) {
+        this.requestAdapter = requestAdapter;
     }
 }

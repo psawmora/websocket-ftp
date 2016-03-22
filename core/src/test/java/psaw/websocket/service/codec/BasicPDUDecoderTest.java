@@ -3,8 +3,6 @@ package psaw.websocket.service.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.junit.Test;
-import psaw.websocket.domain.FileInitRequest;
-import psaw.websocket.domain.FilePartAck;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -30,8 +28,8 @@ public class BasicPDUDecoderTest {
         encodingBuffer
                 .writeInt(filePathBuffer.length)
                 .writeBytes(filePathBuffer);
-        FileInitRequest fileInitRequest = pduDecoder.decodeFileInitRequest(encodingBuffer.nioBuffer());
-        System.out.println(fileInitRequest);
+        //        FileInitRequest fileInitRequest = pduDecoder.decodeFileInitRequest(encodingBuffer.nioBuffer());
+        //        System.out.println(fileInitRequest);
 
     }
 
@@ -44,8 +42,8 @@ public class BasicPDUDecoderTest {
         encodingBuffer
                 .writeLong(Long.parseLong("1122222112121211111"))
                 .writeInt(10);
-        FilePartAck filePartAck = pduDecoder.decodeFilePartAck(encodingBuffer.nioBuffer());
-        System.out.println(filePartAck);
+        //        ServerAck serverAck = pduDecoder.decodeFilePartAck(encodingBuffer.nioBuffer());
+        //        System.out.println(serverAck);
 
     }
 }
