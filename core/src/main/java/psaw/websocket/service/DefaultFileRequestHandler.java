@@ -79,7 +79,6 @@ public class DefaultFileRequestHandler implements FileRequestHandler<BasePdu> {
                 .withFileSize(filePartDetail.length)
                 .withPartLength(filePartDetail.length)
                 .withResponseSenderId(pdu.getResponseSenderId()).build();
-        System.out.println(filePartDetail + " : " + pdu.getNextFilePart());
         responseSenderService.execute(() -> {
             try {
                 responseProcessor.processResponse(dataPdu);

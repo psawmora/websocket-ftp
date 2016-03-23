@@ -9,6 +9,7 @@ package psaw.websocket.service;
  * @author prabath.
  */
 public enum Status {
-    RESPONSE_SEND_FAILED;
+    RESPONSE_SEND_FAILED,
+    ENCODING_FAILURE
 
 }

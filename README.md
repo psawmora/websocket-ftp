@@ -5,9 +5,11 @@
 * A file transferring protocol and an implementation on WebSockets.
 * Includes a JavaScript client and a java based server.
 * The protocol PDUs carries the state and other related info.
-* Do not use any compressions yet.
+* Do not use any compressions yet and need to improve the protocol for efficiency.
+* Need to implement error handling including timeouts and network errors.
    
-## 1.2 Configuration
+## 1.2 Protocol
+[Protocol Document](docs/ws-ftp-protocol.md)
 
 ## 1.4 Location
 * [GitHub](https://github.com/psawmora/websocket-ftp)

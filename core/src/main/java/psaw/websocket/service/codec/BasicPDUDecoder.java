@@ -20,6 +20,8 @@ import java.nio.charset.Charset;
  */
 public class BasicPDUDecoder implements PduDecoder<BasePdu> {
 
+    private final static int FILE_ID_MAX_LENGTH = 8;
+
     @Override
     public BasePdu decode(ByteBuffer requestBuffer) throws WSFtpException {
         requestBuffer = requestBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -42,10 +44,9 @@ public class BasicPDUDecoder implements PduDecoder<BasePdu> {
     }
 
     private BasePdu decodeClientAck(ByteBuffer requestBuffer) {
-        int byteLengthId = requestBuffer.getInt();
-        byte[] idBuffer = new byte[byteLengthId];
+        byte[] idBuffer = new byte[FILE_ID_MAX_LENGTH];
         requestBuffer.get(idBuffer);
-        String id = new String(idBuffer, Charset.defaultCharset());
+        String id = new String(idBuffer, Charset.defaultCharset()).trim();
         int nextIndex = requestBuffer.getInt();
         return ClientAck.newBuilder()
                 .withId(id)
@@ -54,14 +55,15 @@ public class BasicPDUDecoder implements PduDecoder<BasePdu> {
     }
 
     private BasePdu decodeInit(ByteBuffer requestBuffer) {
-        int byteLengthId = requestBuffer.getInt();
-        byte[] idBuffer = new byte[byteLengthId];
+        byte[] idBuffer = new byte[FILE_ID_MAX_LENGTH];
         requestBuffer.get(idBuffer);
-        String id = new String(idBuffer, Charset.defaultCharset());
+        String id = new String(idBuffer, Charset.defaultCharset()).trim();
+
         int byteLengthFileName = requestBuffer.getInt();
         byte[] nameBuffer = new byte[byteLengthFileName];
         requestBuffer.get(nameBuffer);
         String fileName = new String(nameBuffer, Charset.defaultCharset());
+
         return InitPdu.newBuilder()
                 .withFileName(fileName)
                 .withId(id)
